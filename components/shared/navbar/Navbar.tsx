@@ -5,6 +5,7 @@ import React from 'react';
 import { SignedIn, UserButton } from '@clerk/nextjs';
 import Theme from './Theme';
 import MobileNav from './MobileNav';
+import GlobalSearch from '../search/GlobalSearch';
 
 const Navbar = () => {
 	return (
@@ -15,13 +16,16 @@ const Navbar = () => {
 					Dev<span className='text-primary-500'>Flow</span>
 				</p>
 			</Link>
-			{/* GlobalSearch */}
+
+			<GlobalSearch />
+
 			<div className='flex-between gap-5'>
 				<Theme />
+
 				<SignedIn>
 					<UserButton afterSignOutUrl='/' appearance={{ elements: { avatarBox: 'h-10 w-10' }, variables: { colorPrimary: '#FF7000' } }} />
 				</SignedIn>
-				{/* mobile nav */}
+
 				<MobileNav />
 			</div>
 		</nav>
