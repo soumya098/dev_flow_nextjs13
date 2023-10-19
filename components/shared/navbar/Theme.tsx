@@ -14,9 +14,9 @@ const Theme = () => {
 			<MenubarMenu>
 				<MenubarTrigger className='dark:data-[state==closed]:bg-light-200 cursor-pointer focus:bg-light-900 data-[state==open]:bg-light-900 dark:focus:bg-dark-200'>
 					{mode === 'dark' ? (
-						<Image src='/assets/icons/moon.svg' width={25} height={25} alt='dark' className='active-theme' />
+						<Image src='/assets/icons/moon.svg' width={20} height={20} alt='dark' className='active-theme' />
 					) : (
-						<Image src='/assets/icons/sun.svg' width={25} height={25} alt='light' className='active-theme' />
+						<Image src='/assets/icons/sun.svg' width={20} height={20} alt='light' className='active-theme' />
 					)}
 				</MenubarTrigger>
 				<MenubarContent className='absolute right-[-3rem] mt-3 min-w-[120px] rounded border py-2 dark:border-dark-400 dark:bg-dark-300'>
