@@ -11,11 +11,18 @@ import { Editor } from '@tinymce/tinymce-react';
 import { Badge } from '../ui/badge';
 import Image from 'next/image';
 import { createQuestion } from '@/lib/actions/question.action';
+import { useRouter, usePathname } from 'next/navigation';
 
-const Question = () => {
+interface Props {
+	currUserId: string;
+}
+
+const Question = ({ currUserId }: Props) => {
 	const type: string = 'create';
 	const editorRef = useRef(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const router = useRouter();
+	const pathName = usePathname();
 
 	// 1. Define your form.
 	const form = useForm<z.infer<typeof QuestionSchema>>({
@@ -29,13 +36,11 @@ const Question = () => {
 
 	// 2. Define a submit handler.
 	async function onSubmit(values: z.infer<typeof QuestionSchema>) {
-		console.log(values);
 		setIsSubmitting(true);
 		try {
-			// make an async call to api -> create a new Question
-			// contain all form data
-			await createQuestion({});
-			// navigate to home
+			await createQuestion({ title: values.title, content: values.explanation, tags: values.tags, author: JSON.parse(currUserId), path: pathName });
+
+			router.push('/');
 		} catch (error) {
 		} finally {
 			setIsSubmitting(false);

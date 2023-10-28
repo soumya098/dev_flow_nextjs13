@@ -5,46 +5,12 @@ import NoResult from '@/components/shared/NoResult';
 import LocalSearchBar from '@/components/shared/search/LocalSearchBar';
 import { Button } from '@/components/ui/button';
 import { HomePageFilters } from '@/constants/filters';
+import { getQuestions } from '@/lib/actions/question.action';
 import Link from 'next/link';
 
-const questions = [
-	{
-		_id: '1',
-		title: 'How does tailwind determine a class utility to apply if there are competing classes within a component?',
-		tags: [
-			{ _id: '1', name: 'class' },
-			{ _id: '2', name: 'tailwind' }
-		],
-		author: {
-			_id: 'author1',
-			name: 'John Doe',
-			picture: 'john-doe.jpg'
-		},
-		upVotes: 10,
-		views: 2,
-		answers: [],
-		createdAt: new Date('2023-10-22T16:00:04.481Z')
-	},
-	{
-		_id: '2',
-		title: 'how to use useState hook',
-		tags: [
-			{ _id: '5', name: 'react' },
-			{ _id: '7', name: 'useState' }
-		],
-		author: {
-			_id: 'author1',
-			name: 'John Doe',
-			picture: 'john-doe.jpg'
-		},
-		upVotes: 1204540,
-		views: 23,
-		answers: [],
-		createdAt: new Date('2023-10-22T16:00:04.481Z')
-	}
-];
+const Home = async () => {
+	const result = await getQuestions({});
 
-const Home = () => {
 	return (
 		<>
 			<div className='flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center'>
@@ -64,8 +30,8 @@ const Home = () => {
 			<HomeFilter />
 
 			<div className='mt-10 flex w-full flex-col gap-6'>
-				{questions.length > 0 ? (
-					questions.map((question) => (
+				{result.questions.length > 0 ? (
+					result.questions.map((question) => (
 						<QuestionCard
 							key={question._id}
 							id={question._id}
