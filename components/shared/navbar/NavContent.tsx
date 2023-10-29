@@ -5,7 +5,7 @@ import { SheetClose } from '@/components/ui/sheet';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { SidebarLink } from '@/types/indenx';
+import { SidebarLink } from '@/types';
 
 const NavContent = () => {
 	const pathName = usePathname();
