@@ -45,7 +45,7 @@ const QuestionCard = ({ id, title, tags, author, views, upVotes, answers, create
 			<div className='flex-between mt-6 w-full flex-wrap gap-3'>
 				<div className='flex'>
 					<Metric
-						imgUrl={`/assets/icons/avatar.svg`}
+						imgUrl={author.picture}
 						alt='user'
 						value={author.name}
 						title={` - asked ${getTimestamps(createdAt)}`}
@@ -55,7 +55,7 @@ const QuestionCard = ({ id, title, tags, author, views, upVotes, answers, create
 					/>
 				</div>
 
-				<div className='flex-between gap-2'>
+				<div className='flex-between gap-3'>
 					<Metric
 						imgUrl='/assets/icons/like.svg'
 						alt='upVotes'

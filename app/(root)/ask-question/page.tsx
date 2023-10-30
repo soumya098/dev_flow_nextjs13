@@ -11,7 +11,7 @@ const AskQuestion = async () => {
 		redirect('/sign-in');
 	}
 
-	const currentUser = await getUserById({ userId: '123456' });
+	const currentUser = await getUserById({ userId });
 
 	return (
 		<div>
