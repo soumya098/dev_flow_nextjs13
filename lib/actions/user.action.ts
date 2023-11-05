@@ -1,10 +1,19 @@
 'use server';
-
-import User from '@/database/user.model';
+import { FilterQuery } from 'mongoose';
 import { connectToDB } from '../mongoose';
-import { CreateUserParams, DeleteUserParams, GetAllUsersParams, GetUserByIdParams, ToggleSaveQuestionParams, UpdateUserParams } from './shared';
-import { revalidatePath } from 'next/cache';
+import User from '@/database/user.model';
 import Question from '@/database/question.model';
+import Tag from '@/database/tag.model';
+import {
+	CreateUserParams,
+	DeleteUserParams,
+	GetAllUsersParams,
+	GetSavedQuestionsParams,
+	GetUserByIdParams,
+	ToggleSaveQuestionParams,
+	UpdateUserParams
+} from './shared';
+import { revalidatePath } from 'next/cache';
 
 export async function getAllUsers(params: GetAllUsersParams) {
 	try {
@@ -108,6 +117,34 @@ export async function toggleSaveQuestion(params: ToggleSaveQuestionParams) {
 		}
 
 		revalidatePath(path);
+	} catch (error) {
+		console.log(error);
+		throw error;
+	}
+}
+
+export async function getAllSavedQuestions(params: GetSavedQuestionsParams) {
+	try {
+		await connectToDB();
+		const { clerkId, page = 1, filter, pageSize = 20, searchQuery } = params;
+		const query: FilterQuery<typeof Question> = searchQuery ? { title: { $regex: new RegExp(searchQuery, 'i') } } : {};
+
+		const user = await User.findOne({ clerkId }).populate({
+			path: 'saved',
+			match: query,
+			options: { sort: { createdAt: -1 } },
+			populate: [
+				{ path: 'tags', model: Tag, select: '_id name' },
+				{ path: 'author', model: User, select: '_id clerkId name picture' }
+			]
+		});
+
+		if (!user) {
+			throw new Error('user not found');
+		}
+
+		const savedQuestions = user.saved;
+		return { questions: savedQuestions };
 	} catch (error) {
 		console.log(error);
 		throw error;
