@@ -3,6 +3,7 @@ import AllAnswers from '@/components/shared/AllAnswers';
 import Metric from '@/components/shared/Metric';
 import ParseHtml from '@/components/shared/ParseHtml';
 import RenderTag from '@/components/shared/RenderTag';
+import Vote from '@/components/shared/Vote';
 import { getQuestionById } from '@/lib/actions/question.action';
 import { getUserById } from '@/lib/actions/user.action';
 import { formatNumber, getTimestamps } from '@/lib/utils';
@@ -31,7 +32,18 @@ const QuestionPage = async ({ params }: any) => {
 						<p className='paragraph-semibold text-dark300_light700'>{result.author.name}</p>
 					</Link>
 
-					<div className='flex justify-end'>voting</div>
+					<div className='flex justify-end'>
+						<Vote
+							type='question'
+							itemId={JSON.stringify(result._id)}
+							userId={JSON.stringify(currUser?._id)}
+							upVotes={result.upVotes.length}
+							hasUpVoted={result.upVotes.includes(currUser?._id)}
+							downVotes={result.downVotes.length}
+							hasDownVoted={result.downVotes.includes(currUser?._id)}
+							hasSaved={currUser?.saved.includes(result._id)}
+						/>
+					</div>
 				</div>
 
 				<h2 className='h2-semibold text-dark200_light900 mt-3 w-full text-left'>{result.title}</h2>
@@ -69,9 +81,9 @@ const QuestionPage = async ({ params }: any) => {
 				))}
 			</div>
 
-			<AllAnswers questionId={JSON.stringify(result._id)} authorId={JSON.stringify(currUser._id)} totalAnswers={result.answers.length} />
+			<AllAnswers questionId={result._id} userId={currUser?._id} totalAnswers={result.answers.length} />
 
-			<Answer question={result.content} questionId={JSON.stringify(result._id)} authorId={JSON.stringify(currUser._id)} />
+			<Answer question={result.content} questionId={JSON.stringify(result._id)} authorId={JSON.stringify(currUser?._id)} />
 		</>
 	);
 };
