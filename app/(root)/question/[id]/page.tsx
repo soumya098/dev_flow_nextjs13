@@ -1,15 +1,24 @@
 import Answer from '@/components/forms/Answer';
+import AllAnswers from '@/components/shared/AllAnswers';
 import Metric from '@/components/shared/Metric';
 import ParseHtml from '@/components/shared/ParseHtml';
 import RenderTag from '@/components/shared/RenderTag';
 import { getQuestionById } from '@/lib/actions/question.action';
+import { getUserById } from '@/lib/actions/user.action';
 import { formatNumber, getTimestamps } from '@/lib/utils';
+import { auth } from '@clerk/nextjs';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 
 const QuestionPage = async ({ params }: any) => {
 	const questionId = params?.id;
+	const { userId } = auth();
+	let currUser;
+
+	if (userId) {
+		currUser = await getUserById({ userId });
+	}
 
 	const result = await getQuestionById({ questionId });
 
@@ -60,7 +69,9 @@ const QuestionPage = async ({ params }: any) => {
 				))}
 			</div>
 
-			<Answer />
+			<AllAnswers questionId={JSON.stringify(result._id)} authorId={JSON.stringify(currUser._id)} totalAnswers={result.answers.length} />
+
+			<Answer question={result.content} questionId={JSON.stringify(result._id)} authorId={JSON.stringify(currUser._id)} />
 		</>
 	);
 };
