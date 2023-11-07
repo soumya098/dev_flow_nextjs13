@@ -2,10 +2,11 @@
 import { downVoteQuestion, upVoteQuestion } from '@/lib/actions/question.action';
 import { formatNumber } from '@/lib/utils';
 import Image from 'next/image';
-import React from 'react';
-import { usePathname } from 'next/navigation';
+import React, { useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { downVoteAnswer, upVoteAnswer } from '@/lib/actions/answer.action';
 import { toggleSaveQuestion } from '@/lib/actions/user.action';
+import { viewQuestion } from '@/lib/actions/interaction.action';
 
 interface Props {
 	type: string;
@@ -20,6 +21,11 @@ interface Props {
 
 const Vote = ({ upVotes, downVotes, type, itemId, userId, hasSaved, hasDownVoted, hasUpVoted }: Props) => {
 	const pathName = usePathname();
+	const router = useRouter();
+
+	useEffect(() => {
+		viewQuestion({ questionId: JSON.parse(itemId), userId: userId ? JSON.parse(userId) : undefined });
+	}, [itemId, userId, pathName, router]);
 
 	const handleSave = async () => {
 		if (userId) {
