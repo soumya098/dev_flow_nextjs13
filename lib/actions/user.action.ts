@@ -3,6 +3,7 @@ import { FilterQuery } from 'mongoose';
 import { connectToDB } from '../mongoose';
 import User from '@/database/user.model';
 import Question from '@/database/question.model';
+import Answer from '@/database/answer.model';
 import Tag from '@/database/tag.model';
 import {
 	CreateUserParams,
@@ -148,5 +149,23 @@ export async function getAllSavedQuestions(params: GetSavedQuestionsParams) {
 	} catch (error) {
 		console.log(error);
 		throw error;
+	}
+}
+
+export async function getUserInfo(params: GetUserByIdParams) {
+	try {
+		connectToDB();
+		const { userId } = params;
+
+		const user = await User.findOne({ clerkId: userId });
+		if (!user) {
+			throw new Error(`User not found`);
+		}
+
+		const totalQuesetions = await Question.countDocuments({ author: user._id });
+		const totalAnswers = await Answer.countDocuments({ author: user._id });
+		return { user, totalQuesetions, totalAnswers };
+	} catch (error) {
+		console.log(error);
 	}
 }
