@@ -18,7 +18,7 @@ const AskQuestion = async () => {
 			<h1 className='h1-bold text-dark100_light900'>Ask a question</h1>
 
 			<div className='mt-8'>
-				<Question currUserId={JSON.stringify(currentUser._id)} />
+				<Question currUserId={JSON.stringify(currentUser._id)} type='create' />
 			</div>
 		</div>
 	);

@@ -13,7 +13,7 @@ import Link from 'next/link';
 import React from 'react';
 
 const QuestionPage = async ({ params }: any) => {
-	const questionId = params?.id;
+	const questionId = params.id;
 	const { userId } = auth();
 	let currUser;
 

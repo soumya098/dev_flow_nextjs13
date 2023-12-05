@@ -9,3 +9,11 @@ export const QuestionSchema = z.object({
 export const AnswerSchema = z.object({
 	answer: z.string().min(100, 'Answer must be at least 100 characters')
 });
+
+export const UserSchema = z.object({
+	name: z.string().min(10).max(30),
+	username: z.string().min(5).max(15),
+	website: z.string().url({ message: 'Please provide valid URL' }).optional().or(z.literal('')),
+	bio: z.string(),
+	location: z.string()
+});

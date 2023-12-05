@@ -5,14 +5,16 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { getJoinedDate } from '@/lib/utils';
 import ProfileLink from '@/components/shared/ProfileLink';
 import Stats from '@/components/shared/Stats';
+import QuestionsTab from '@/components/shared/QuestionsTab';
+import AnswersTab from '@/components/shared/AnswersTab';
 
 const page = async ({ params, searchParams }: URLProps) => {
-	const userInfo = await getUserInfo({ userId: params.id });
 	const { userId: clerkId } = auth();
-	console.log(userInfo);
+	const userInfo = await getUserInfo({ userId: params?.id });
 
 	return (
 		<>
@@ -23,35 +25,35 @@ const page = async ({ params, searchParams }: URLProps) => {
 						<h2 className='h2-bold text-dark100_light900'>{userInfo?.user.name}</h2>
 						<p className='paragraph-regular text-dark200_light800'>@{userInfo?.user.username}</p>
 
-						<div className='flex-center mt-5 flex flex-wrap justify-start gap-5'>
+						<div className='mt-5 flex flex-wrap items-center justify-start gap-5'>
 							{userInfo?.user.website && <ProfileLink imgUrl='/assets/icons/link.svg' href={userInfo?.user.website} title='Portfolio' />}
 
-							{userInfo?.user.location && <p>{userInfo?.user.location}</p>}
+							{userInfo?.user.location && <ProfileLink imgUrl='/assets/icons/location.svg' title={userInfo.user.location} />}
 
 							<ProfileLink imgUrl='/assets/icons/calendar.svg' title={getJoinedDate(userInfo?.user.joinedAt)} />
 						</div>
 
-						{userInfo?.user.bio && <p className='paragraph-regular text-dark400_light800 mt-8'>{userInfo?.user.bio}</p>}
+						{userInfo?.user.bio && <p className='paragraph-regular text-dark400_light800 mt-8'>{userInfo.user.bio}</p>}
 					</div>
 				</div>
 
 				<div className='flex justify-end max-sm:mb-5 max-sm:w-full sm:mt-3'>
 					<SignedIn>
 						{clerkId === userInfo?.user.clerkId && (
-							<Link
-								href={`/profile/edit`}
-								className='btn-secondary paragraph-medium text-dark300_light900 min-h-[46px] min-w-[175px] px-4 py-3 text-center'>
-								Edit Profile
+							<Link href={`/profile/edit`}>
+								<Button className='btn-secondary paragraph-medium text-dark300_light900 h-9 min-h-[46px] min-w-[175px] px-4 py-3 text-center shadow'>
+									Edit Profile
+								</Button>
 							</Link>
 						)}
 					</SignedIn>
 				</div>
 			</div>
 
-			<Stats />
+			<Stats totalQuestions={userInfo?.totalQuestions} totalAnswers={userInfo?.totalAnswers} />
 
 			<div className='mt-8 flex gap-10'>
-				<Tabs defaultValue='question' className='w-[400px]'>
+				<Tabs defaultValue='question' className='flex-1'>
 					<TabsList className='background-light800_dark400 min-h-[42px] p-2'>
 						<TabsTrigger value='question' className='tab rounded-md'>
 							Top Posts
@@ -60,8 +62,12 @@ const page = async ({ params, searchParams }: URLProps) => {
 							Answers
 						</TabsTrigger>
 					</TabsList>
-					<TabsContent value='question'>Posts</TabsContent>
-					<TabsContent value='answer'>Answers</TabsContent>
+					<TabsContent value='question' className='flex w-full flex-col gap-6'>
+						<QuestionsTab userId={userInfo?.user._id} clerkId={userInfo?.user.clerkId} searchParams={searchParams} />
+					</TabsContent>
+					<TabsContent value='answer' className='flex w-full flex-col gap-6'>
+						<AnswersTab userId={userInfo?.user._id} clerkId={userInfo?.user.clerkId} searchParams={searchParams} />
+					</TabsContent>
 				</Tabs>
 			</div>
 		</>

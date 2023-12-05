@@ -1,10 +1,19 @@
 'use server';
 
 import { connectToDB } from '../mongoose';
-import { CreateQuestionParams, GetQuestionByIdParams, GetQuestionsParams, QuestionVoteParams } from './shared';
 import Question from '@/database/question.model';
+import Answer from '@/database/answer.model';
 import Tag from '@/database/tag.model';
 import User from '@/database/user.model';
+import Interaction from '@/database/interaction.model';
+import {
+	CreateQuestionParams,
+	DeleteQuestionParams,
+	EditQuestionParams,
+	GetQuestionByIdParams,
+	GetQuestionsParams,
+	QuestionVoteParams
+} from './shared';
 import { revalidatePath } from 'next/cache';
 
 export async function getQuestions(params: GetQuestionsParams) {
@@ -23,7 +32,7 @@ export async function getQuestions(params: GetQuestionsParams) {
 
 export async function getQuestionById(params: GetQuestionByIdParams) {
 	try {
-		await connectToDB();
+		connectToDB();
 
 		const { questionId } = params;
 
@@ -66,6 +75,28 @@ export async function createQuestion(params: CreateQuestionParams) {
 		});
 
 		// TODO: increment author's reputation by +5 for asking question
+
+		revalidatePath(path);
+	} catch (error) {
+		console.log(error);
+		throw error;
+	}
+}
+
+export async function updateQuestion(params: EditQuestionParams) {
+	try {
+		connectToDB();
+
+		const { questionId, title, content, path } = params;
+		const question = await Question.findById(questionId).populate('tags');
+
+		if (!question) {
+			throw new Error('Could not find Question');
+		}
+
+		question.title = title;
+		question.content = content;
+		await question.save();
 
 		revalidatePath(path);
 	} catch (error) {
@@ -130,6 +161,29 @@ export async function downVoteQuestion(params: QuestionVoteParams) {
 		}
 
 		// increment authors reputation
+
+		revalidatePath(path);
+	} catch (error) {
+		console.log(error);
+		throw error;
+	}
+}
+
+export async function deleteQuestion(params: DeleteQuestionParams) {
+	try {
+		connectToDB();
+		const { questionId, path } = params;
+
+		const question = await Question.findById(questionId);
+
+		if (!question) {
+			throw new Error('Question not found!');
+		}
+
+		await question.deleteOne();
+		await Answer.deleteMany({ question: questionId });
+		await Interaction.deleteMany({ question: questionId });
+		await Tag.updateMany({ questions: questionId }, { $pull: { questions: questionId } });
 
 		revalidatePath(path);
 	} catch (error) {

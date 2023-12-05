@@ -1,51 +1,38 @@
 import Link from 'next/link';
 import React from 'react';
-import RenderTag from '../shared/RenderTag';
 import Metric from '../shared/Metric';
 import { formatNumber, getTimestamps } from '@/lib/utils';
-import { SignedIn } from '@clerk/nextjs';
 import EditDeleteAction from '../shared/EditDeleteAction';
+import { SignedIn } from '@clerk/nextjs';
 
 interface Props {
 	id: string;
 	title: string;
-	tags: {
-		_id: string;
-		name: string;
-	}[];
 	author: {
 		_id: string;
 		name: string;
 		picture: string;
 	};
-	views: number;
-	upVotes: Array<object>;
-	answers: Array<object>;
+	upVotes: number;
+	question: object;
 	createdAt: Date;
-	clerkId?: string;
+	clerkId?: string | null;
 }
 
-const QuestionCard = ({ clerkId, id, title, tags, author, views, upVotes, answers, createdAt }: Props) => {
+const AnswerCard = ({ id, clerkId, title, author, upVotes, createdAt, question }: Props) => {
 	const showActionButtons = clerkId === author.clerkId;
-
 	return (
 		<div className='card-wrapper rounded-[10px] p-9 sm:px-11'>
 			<div className='flex flex-col-reverse items-start justify-between gap-6 sm:flex-row'>
 				<div>
 					<span className='subtle-regular text-dark400_light700 line-clamp-1 flex sm:hidden'>{getTimestamps(createdAt)}</span>
 
-					<Link href={`/question/${id}`}>
+					<Link href={`/question/${question._id}/#${id}`}>
 						<h3 className='sm:h3-semibold base-semibold text-dark200_light900 line-clamp-1 flex-1'>{title}</h3>
 					</Link>
 				</div>
 
-				<SignedIn>{showActionButtons && <EditDeleteAction type='Question' itemId={JSON.stringify(id)} />}</SignedIn>
-			</div>
-
-			<div className='mt-3 flex flex-wrap gap-2 '>
-				{tags.map((tag) => (
-					<RenderTag key={tag._id} id={tag._id} name={tag.name} />
-				))}
+				<SignedIn>{showActionButtons && <EditDeleteAction type='Answer' itemId={JSON.stringify(id)} />}</SignedIn>
 			</div>
 
 			<div className='flex-between mt-6 w-full flex-wrap gap-3'>
@@ -54,7 +41,7 @@ const QuestionCard = ({ clerkId, id, title, tags, author, views, upVotes, answer
 						imgUrl={author.picture}
 						alt='user'
 						value={author.name}
-						title={` - asked ${getTimestamps(createdAt)}`}
+						title={` - answered ${getTimestamps(createdAt)}`}
 						textStyles='body-medium text-dark400_light700'
 						href={`/profile/${author._id}`}
 						isAuthor
@@ -65,22 +52,8 @@ const QuestionCard = ({ clerkId, id, title, tags, author, views, upVotes, answer
 					<Metric
 						imgUrl='/assets/icons/like.svg'
 						alt='upVotes'
-						value={formatNumber(upVotes.length)}
+						value={formatNumber(upVotes)}
 						title=' Votes'
-						textStyles='small-medium text-dark400_light800'
-					/>
-					<Metric
-						imgUrl='/assets/icons/message.svg'
-						alt='answers'
-						value={formatNumber(answers.length)}
-						title=' Answers'
-						textStyles='small-medium text-dark400_light800'
-					/>
-					<Metric
-						imgUrl='/assets/icons/eye.svg'
-						alt='views'
-						value={formatNumber(views)}
-						title=' Views'
 						textStyles='small-medium text-dark400_light800'
 					/>
 				</div>
@@ -89,4 +62,4 @@ const QuestionCard = ({ clerkId, id, title, tags, author, views, upVotes, answer
 	);
 };
 
-export default QuestionCard;
+export default AnswerCard;

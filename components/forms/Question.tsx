@@ -10,44 +10,58 @@ import React, { useRef, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import { Badge } from '../ui/badge';
 import Image from 'next/image';
-import { createQuestion } from '@/lib/actions/question.action';
+import { createQuestion, updateQuestion } from '@/lib/actions/question.action';
 import { useRouter, usePathname } from 'next/navigation';
 import { useTheme } from '@/context/ThemeProvider';
 
 interface Props {
 	currUserId: string;
+	type?: string;
+	questionDetails?: string | undefined;
 }
 
-const Question = ({ currUserId }: Props) => {
-	const type: string = 'create';
-	const editorRef = useRef(null);
-	const [isSubmitting, setIsSubmitting] = useState(false);
+const Question = ({ currUserId, type, questionDetails }: Props) => {
+	const { mode } = useTheme();
 	const router = useRouter();
 	const pathName = usePathname();
-	const { mode } = useTheme();
+	const editorRef = useRef(null);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const parsedQuestionDetails = JSON.parse(questionDetails || '');
+
+	const groupedTags = parsedQuestionDetails.tags.map((tag: any) => tag.name);
 
 	// 1. Define your form.
 	const form = useForm<z.infer<typeof QuestionSchema>>({
 		resolver: zodResolver(QuestionSchema),
 		defaultValues: {
-			title: '',
-			explanation: '',
-			tags: []
+			title: parsedQuestionDetails.title || '',
+			explanation: parsedQuestionDetails.content || '',
+			tags: groupedTags || []
 		}
 	});
 
 	// 2. Define a submit handler.
-	async function onSubmit(values: z.infer<typeof QuestionSchema>) {
+	const onSubmit = async (values: z.infer<typeof QuestionSchema>) => {
 		setIsSubmitting(true);
 		try {
-			await createQuestion({ title: values.title, content: values.explanation, tags: values.tags, author: JSON.parse(currUserId), path: pathName });
-
-			router.push('/');
+			if (type === 'create') {
+				await createQuestion({ title: values.title, content: values.explanation, tags: values.tags, author: JSON.parse(currUserId), path: pathName });
+				router.push('/');
+			} else if (type === 'edit') {
+				await updateQuestion({
+					questionId: parsedQuestionDetails._id,
+					title: values.title,
+					content: values.explanation,
+					tags: values.tags,
+					path: pathName
+				});
+				router.push(`/question/${parsedQuestionDetails._id}`);
+			}
 		} catch (error) {
 		} finally {
 			setIsSubmitting(false);
 		}
-	}
+	};
 
 	const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, field: any) => {
 		if (e.key === 'Enter' && field.name === 'tags') {
@@ -120,7 +134,7 @@ const Question = ({ currUserId }: Props) => {
 										// @ts-ignore
 										editorRef.current = editor;
 									}}
-									initialValue=''
+									initialValue={parsedQuestionDetails.content}
 									onBlur={field.onBlur}
 									onEditorChange={(content) => field.onChange(content)}
 									init={{

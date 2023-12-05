@@ -11,6 +11,7 @@ import {
 	GetAllUsersParams,
 	GetSavedQuestionsParams,
 	GetUserByIdParams,
+	GetUserStatsParams,
 	ToggleSaveQuestionParams,
 	UpdateUserParams
 } from './shared';
@@ -31,7 +32,7 @@ export async function getAllUsers(params: GetAllUsersParams) {
 
 export async function getUserById(params: GetUserByIdParams) {
 	try {
-		await connectToDB();
+		connectToDB();
 		const { userId } = params;
 
 		const user = await User.findOne({ clerkId: userId });
@@ -43,7 +44,7 @@ export async function getUserById(params: GetUserByIdParams) {
 
 export async function createUser(params: CreateUserParams) {
 	try {
-		await connectToDB();
+		connectToDB();
 
 		const newUser = await User.create(params);
 
@@ -56,7 +57,7 @@ export async function createUser(params: CreateUserParams) {
 
 export async function updateUser(params: UpdateUserParams) {
 	try {
-		await connectToDB();
+		connectToDB();
 		const { clerkId, updateData, path } = params;
 
 		await User.findOneAndUpdate({ clerkId }, updateData, {
@@ -72,7 +73,7 @@ export async function updateUser(params: UpdateUserParams) {
 
 export async function deleteUser(params: DeleteUserParams) {
 	try {
-		await connectToDB();
+		connectToDB();
 		const { clerkId } = params;
 
 		const user = await User.findOne({ clerkId });
@@ -101,7 +102,7 @@ export async function deleteUser(params: DeleteUserParams) {
 
 export async function toggleSaveQuestion(params: ToggleSaveQuestionParams) {
 	try {
-		await connectToDB();
+		connectToDB();
 		const { userId, questionId, path } = params;
 
 		const user = await User.findById(userId);
@@ -126,7 +127,7 @@ export async function toggleSaveQuestion(params: ToggleSaveQuestionParams) {
 
 export async function getAllSavedQuestions(params: GetSavedQuestionsParams) {
 	try {
-		await connectToDB();
+		connectToDB();
 		const { clerkId, page = 1, filter, pageSize = 20, searchQuery } = params;
 		const query: FilterQuery<typeof Question> = searchQuery ? { title: { $regex: new RegExp(searchQuery, 'i') } } : {};
 
@@ -162,9 +163,43 @@ export async function getUserInfo(params: GetUserByIdParams) {
 			throw new Error(`User not found`);
 		}
 
-		const totalQuesetions = await Question.countDocuments({ author: user._id });
+		const totalQuestions = await Question.countDocuments({ author: user._id });
 		const totalAnswers = await Answer.countDocuments({ author: user._id });
-		return { user, totalQuesetions, totalAnswers };
+		return { user, totalQuestions, totalAnswers };
+	} catch (error) {
+		console.log(error);
+	}
+}
+
+export async function getUserQuestions(params: GetUserStatsParams) {
+	try {
+		connectToDB();
+		const { userId, page = 1, pageSize = 10 } = params;
+
+		const totalQuestions = await Question.countDocuments({ author: userId });
+		const userQuestions = await Question.find({ author: userId })
+			.sort({ views: -1 })
+			.populate('tags', '_id name')
+			.populate('author', '_id clerkId name picture');
+
+		return { totalQuestions, questions: userQuestions };
+	} catch (error) {
+		console.log(error);
+	}
+}
+
+export async function getUserAnswers(params: GetUserStatsParams) {
+	try {
+		connectToDB();
+		const { userId, page = 1, pageSize = 10 } = params;
+
+		const totalAnswers = await Answer.countDocuments({ author: userId });
+		const userAnswers = await Answer.find({ author: userId })
+			.sort({ upVotes: -1 })
+			.populate('question', '_id title')
+			.populate('author', '_id clerkId name picture');
+
+		return { totalAnswers, answers: userAnswers };
 	} catch (error) {
 		console.log(error);
 	}
