@@ -2,8 +2,22 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import RenderTag from './RenderTag';
+import { getHotQuestions } from '@/lib/actions/question.action';
+import { getTopPopularTags } from '@/lib/actions/tag.action';
 
-const RightSideBar = () => {
+const RightSideBar = async () => {
+	const hotQuestions = await getHotQuestions();
+	const popularTags = await getTopPopularTags();
+
+	const renderQuestions = hotQuestions.map((question) => (
+		<Link href={`/question/${question._id}`} className='flex-between cursor-pointer gap-6' key={question._id}>
+			<p className='body-medium text-dark500_light700'>{question.title}</p>
+			<Image src='/assets/icons/chevron-right.svg' width={15} height={15} alt='go-to' className='invert-colors' />
+		</Link>
+	));
+
+	const renderTags = popularTags.map((tag) => <RenderTag key={tag._id} name={tag.name} id={tag._id} count={tag.questionSize} showCount />);
+
 	return (
 		<section className='background-light900_dark200 custom-scrollbar light-border sticky right-0 top-0 flex h-screen w-[350px] flex-col overflow-y-auto border-l p-6 pt-36 shadow-light-300 dark:shadow-none max-xl:hidden'>
 			<div>
@@ -18,29 +32,5 @@ const RightSideBar = () => {
 		</section>
 	);
 };
-
-const questions = [
-	'Creola Katherine Johnson: mathematician',
-	'Mario José Molina-Pasquel Henríquez: chemist',
-	'Mohammad Abdus Salam: physicist',
-	'Percy Lavon Julian: chemist',
-	'Subrahmanyan Chandrasekhar: astrophysicist'
-];
-
-const renderQuestions = questions.map((question) => (
-	<Link href='/' className='flex-between cursor-pointer gap-6' key={question}>
-		<p className='body-medium text-dark500_light700'>{question}</p>
-		<Image src='/assets/icons/chevron-right.svg' width={15} height={15} alt='go-to' className='invert-colors' />
-	</Link>
-));
-
-const tags = [
-	{ count: 3, label: 'next' },
-	{ count: 4, label: 'react' },
-	{ count: 5, label: 'veu' },
-	{ count: 7, label: 'javascript' }
-];
-
-const renderTags = tags.map((tag) => <RenderTag key={tag.count} name={tag.label} id={tag.label} count={tag.count} showCount />);
 
 export default RightSideBar;

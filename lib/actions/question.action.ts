@@ -18,12 +18,24 @@ import { revalidatePath } from 'next/cache';
 
 export async function getQuestions(params: GetQuestionsParams) {
 	try {
-		await connectToDB();
+		connectToDB();
 		const questions = await Question.find({})
 			.populate({ path: 'tags', model: Tag })
 			.populate({ path: 'author', model: User })
 			.sort({ createdAt: -1 });
 		return { questions };
+	} catch (error) {
+		console.log(error);
+		throw error;
+	}
+}
+
+export async function getHotQuestions() {
+	try {
+		connectToDB();
+		const questions = await Question.find({}).sort({views: -1, upVotes: -1}).limit(5)
+
+		return questions;
 	} catch (error) {
 		console.log(error);
 		throw error;
@@ -107,7 +119,7 @@ export async function updateQuestion(params: EditQuestionParams) {
 
 export async function upVoteQuestion(params: QuestionVoteParams) {
 	try {
-		await connectToDB();
+		connectToDB();
 		const { questionId, userId, hasUpVoted, hasDownVoted, path } = params;
 		let updateQuery = {};
 
@@ -139,7 +151,7 @@ export async function upVoteQuestion(params: QuestionVoteParams) {
 
 export async function downVoteQuestion(params: QuestionVoteParams) {
 	try {
-		await connectToDB();
+		connectToDB();
 		const { questionId, userId, hasUpVoted, hasDownVoted, path } = params;
 		let updateQuery = {};
 
