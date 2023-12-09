@@ -10,9 +10,10 @@ import Question from '@/database/question.model';
 export async function getAllTags(params: GetAllTagsParams) {
 	try {
 		await connectToDB();
-		// const {page, filter, searchQuery, pageSize } = params
+		const { page, filter, searchQuery, pageSize } = params;
+		const query: FilterQuery<ITag> = searchQuery ? { name: { $regex: new RegExp(searchQuery, 'i') } } : {};
 
-		const tags = await Tag.find({});
+		const tags = await Tag.find(query);
 
 		return { tags };
 	} catch (error) {

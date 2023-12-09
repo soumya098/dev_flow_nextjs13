@@ -34,7 +34,7 @@ export interface SearchParamsProps {
 	searchParams: { [key: string]: string | undefined };
 }
 
-export interface  URLProps {
+export interface URLProps {
 	params: { id: string };
 	searchParams: { [key: string]: string | undefined };
 }
@@ -43,6 +43,17 @@ export interface BadgeCounts {
 	GOLD: number;
 	SILVER: number;
 	BRONZE: number;
+}
+
+export interface URLQueryParams {
+	params: string;
+	key: string;
+	value: string | null;
+}
+
+export interface RemoveURLQueryParams {
+	params: string;
+	keys: string[];
 }
 
 export type BadgeCriteriaType = keyof typeof BADGE_CRITERIA;

@@ -2,18 +2,18 @@ import QuestionCard from '@/components/cards/QuestionCard';
 import Filter from '@/components/shared/Filter';
 import NoResult from '@/components/shared/NoResult';
 import LocalSearchBar from '@/components/shared/search/LocalSearchBar';
-// import { Button } from '@/components/ui/button';
 import { QuestionFilters } from '@/constants/filters';
 import { getAllSavedQuestions } from '@/lib/actions/user.action';
+import { SearchParamsProps } from '@/types';
 import { auth } from '@clerk/nextjs';
-// import Link from 'next/link';
 
-const Collection = async () => {
+const Collection = async ({ searchParams }: SearchParamsProps) => {
 	const { userId: clerkId } = auth();
+	const searchQuery = searchParams.q;
 
 	if (!clerkId) return null;
 
-	const result = await getAllSavedQuestions({ clerkId });
+	const result = await getAllSavedQuestions({ clerkId, searchQuery });
 
 	return (
 		<>
@@ -23,7 +23,7 @@ const Collection = async () => {
 
 			<div className='mt-10 flex justify-between gap-5 max-sm:flex-col sm:items-center'>
 				<LocalSearchBar
-					route='/'
+					route='/collection'
 					iconPosition='left'
 					imgSrc='/assets/icons/search.svg'
 					placeholder='Search For Questions....'

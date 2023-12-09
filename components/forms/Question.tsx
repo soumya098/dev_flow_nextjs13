@@ -26,16 +26,16 @@ const Question = ({ currUserId, type, questionDetails }: Props) => {
 	const pathName = usePathname();
 	const editorRef = useRef(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const parsedQuestionDetails = JSON.parse(questionDetails || '');
 
-	const groupedTags = parsedQuestionDetails.tags.map((tag: any) => tag.name);
+	const parsedQuestionDetails = questionDetails && JSON.parse(questionDetails);
+	const groupedTags = parsedQuestionDetails && parsedQuestionDetails.tags.map((tag: any) => tag.name);
 
 	// 1. Define your form.
 	const form = useForm<z.infer<typeof QuestionSchema>>({
 		resolver: zodResolver(QuestionSchema),
 		defaultValues: {
-			title: parsedQuestionDetails.title || '',
-			explanation: parsedQuestionDetails.content || '',
+			title: parsedQuestionDetails?.title || '',
+			explanation: parsedQuestionDetails?.content || '',
 			tags: groupedTags || []
 		}
 	});
@@ -134,7 +134,7 @@ const Question = ({ currUserId, type, questionDetails }: Props) => {
 										// @ts-ignore
 										editorRef.current = editor;
 									}}
-									initialValue={parsedQuestionDetails.content}
+									initialValue={parsedQuestionDetails?.content || ''}
 									onBlur={field.onBlur}
 									onEditorChange={(content) => field.onChange(content)}
 									init={{
@@ -193,7 +193,7 @@ const Question = ({ currUserId, type, questionDetails }: Props) => {
 
 									{field.value.length > 0 && (
 										<div className='flex-start mt-2 gap-2'>
-											{field.value.map((tag: any) => (
+											{field.value.map((tag: string) => (
 												<Badge
 													key={tag}
 													className='subtle-medium background-light800_dark300 text-light400_light500 flex-center gap-2 rounded-md border-none px-4 py-2 capitalize'

@@ -1,7 +1,7 @@
 'use server';
-
 import { connectToDB } from '../mongoose';
-import Question from '@/database/question.model';
+import { FilterQuery } from 'mongoose';
+import Question, { IQuestion } from '@/database/question.model';
 import Answer from '@/database/answer.model';
 import Tag from '@/database/tag.model';
 import User from '@/database/user.model';
@@ -19,10 +19,28 @@ import { revalidatePath } from 'next/cache';
 export async function getQuestions(params: GetQuestionsParams) {
 	try {
 		connectToDB();
-		const questions = await Question.find({})
+
+		const { searchQuery } = params;
+		const query: FilterQuery<IQuestion> = {};
+
+		if (searchQuery) {
+			const regexPattern = new RegExp(searchQuery, 'i');
+			query.$or = [
+				{ title: { $regex: regexPattern } },
+				{ content: { $regex: regexPattern } },
+				{
+					tags: {
+						$in: await Tag.find({ name: { $regex: regexPattern } }, '_id').then((matchingTags) => matchingTags.map((tag) => tag._id))
+					}
+				}
+			];
+		}
+
+		const questions = await Question.find(query)
 			.populate({ path: 'tags', model: Tag })
 			.populate({ path: 'author', model: User })
 			.sort({ createdAt: -1 });
+
 		return { questions };
 	} catch (error) {
 		console.log(error);
@@ -33,7 +51,7 @@ export async function getQuestions(params: GetQuestionsParams) {
 export async function getHotQuestions() {
 	try {
 		connectToDB();
-		const questions = await Question.find({}).sort({views: -1, upVotes: -1}).limit(5)
+		const questions = await Question.find({}).sort({ views: -1, upVotes: -1 }).limit(5);
 
 		return questions;
 	} catch (error) {
