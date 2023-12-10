@@ -9,7 +9,8 @@ import React from 'react';
 
 const Community = async ({ searchParams }: SearchParamsProps) => {
 	const searchQuery = searchParams.q;
-	const result = await getAllUsers({ searchQuery });
+	const filter = searchParams.filter;
+	const result = await getAllUsers({ searchQuery, filter });
 
 	return (
 		<>

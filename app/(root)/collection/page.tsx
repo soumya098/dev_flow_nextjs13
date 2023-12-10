@@ -10,10 +10,11 @@ import { auth } from '@clerk/nextjs';
 const Collection = async ({ searchParams }: SearchParamsProps) => {
 	const { userId: clerkId } = auth();
 	const searchQuery = searchParams.q;
+	const filter = searchParams.filter;
 
 	if (!clerkId) return null;
 
-	const result = await getAllSavedQuestions({ clerkId, searchQuery });
+	const result = await getAllSavedQuestions({ clerkId, searchQuery, filter });
 
 	return (
 		<>

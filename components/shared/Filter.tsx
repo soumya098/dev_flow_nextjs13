@@ -1,6 +1,8 @@
 'use client';
 import React from 'react';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { createUrl } from '@/lib/utils';
 
 interface Props {
 	options: {
@@ -10,9 +12,18 @@ interface Props {
 	otherClasses?: string;
 }
 const Filter = ({ options, otherClasses }: Props) => {
+	const searchParams = useSearchParams();
+	const filter = searchParams.get('filter');
+	const router = useRouter();
+
+	const handleUpdateFilter = (value: string) => {
+		const newUrl = createUrl({ params: searchParams.toString(), key: 'filter', value });
+		router.push(newUrl, { scroll: false });
+	};
+
 	return (
 		<>
-			<Select>
+			<Select onValueChange={(value) => handleUpdateFilter(value)} defaultValue={filter || ''}>
 				<SelectTrigger className={`${otherClasses} body-regular no-focus background-light800_dark300 text-dark500_light700 light-border px-5 py-3`}>
 					<div className='line-clamp-1 flex-1 text-left'>
 						<SelectValue placeholder='Select a Filter' />

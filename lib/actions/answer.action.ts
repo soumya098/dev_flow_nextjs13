@@ -30,11 +30,30 @@ export const createAnswer = async (params: CreateAnswerParams) => {
 export const getAnswers = async (params: GetAnswersParams) => {
 	try {
 		await connectToDB();
-		const { questionId } = params;
+		const { questionId, filter } = params;
+		let sortOptions = {};
+
+		switch (filter) {
+			case 'highest_upvotes':
+				sortOptions = { upVotes: -1 };
+				break;
+			case 'lowest_upvotes':
+				sortOptions = { upVotes: 1 };
+				break;
+			case 'recent':
+				sortOptions = { createdAt: -1 };
+				break;
+			case 'old':
+				sortOptions = { createdAt: 1 };
+				break;
+			default:
+				sortOptions = { createdAt: -1 };
+				break;
+		}
 
 		const answers = await Answer.find({ question: questionId })
 			.populate({ path: 'author', model: User, select: '_id clerkId name picture' })
-			.sort({ createdAt: -1 });
+			.sort(sortOptions);
 
 		return { answers };
 	} catch (error) {

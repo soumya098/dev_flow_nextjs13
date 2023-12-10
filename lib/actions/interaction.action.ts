@@ -11,7 +11,6 @@ export async function viewQuestion(params: ViewQuestionParams) {
 
 		// update view count of the question
 		await Question.findByIdAndUpdate(questionId, { $inc: { views: 1 } });
-		console.log(questionId);
 
 		if (userId) {
 			const existingInteraction = await Interaction.findOne({ user: userId, action: 'view', question: questionId });

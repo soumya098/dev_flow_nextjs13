@@ -7,13 +7,15 @@ import Vote from '@/components/shared/Vote';
 import { getQuestionById } from '@/lib/actions/question.action';
 import { getUserById } from '@/lib/actions/user.action';
 import { formatNumber, getTimestamps } from '@/lib/utils';
+import { URLProps } from '@/types';
 import { auth } from '@clerk/nextjs';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 
-const QuestionPage = async ({ params }: any) => {
+const QuestionPage = async ({ params, searchParams }: URLProps) => {
 	const questionId = params.id;
+	const filter = searchParams.filter;
 	const { userId } = auth();
 	let currUser;
 
@@ -81,7 +83,7 @@ const QuestionPage = async ({ params }: any) => {
 				))}
 			</div>
 
-			<AllAnswers questionId={result._id} userId={currUser?._id} totalAnswers={result.answers.length} />
+			<AllAnswers questionId={result._id} userId={currUser?._id} totalAnswers={result.answers.length} filter={filter} />
 
 			<Answer question={result.content} questionId={JSON.stringify(result._id)} authorId={JSON.stringify(currUser?._id)} />
 		</>

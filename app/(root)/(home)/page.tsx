@@ -10,10 +10,9 @@ import { SearchParamsProps } from '@/types';
 import Link from 'next/link';
 
 const Home = async ({ searchParams }: SearchParamsProps) => {
-	// const filter = searchParams.filter;
+	const filter = searchParams.filter;
 	const searchQuery = searchParams.q;
-
-	const result = await getQuestions({ searchQuery });
+	const result = await getQuestions({ filter, searchQuery });
 
 	return (
 		<>

@@ -36,7 +36,6 @@ const Profile = ({ clerkId, user }: Props) => {
 	const onSubmit = async (values: z.infer<typeof UserSchema>) => {
 		setIsSubmitting(true);
 		try {
-			console.log(values);
 			await updateUser({ clerkId, updateData: values, path: pathName });
 			router.back();
 		} catch (error) {
