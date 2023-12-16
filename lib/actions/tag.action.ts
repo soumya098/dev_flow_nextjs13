@@ -9,9 +9,10 @@ import Question from '@/database/question.model';
 
 export async function getAllTags(params: GetAllTagsParams) {
 	try {
-		await connectToDB();
-		const { page, filter, searchQuery, pageSize } = params;
+		connectToDB();
+		const { page = 1, filter, searchQuery, pageSize = 2 } = params;
 		const query: FilterQuery<ITag> = searchQuery ? { name: { $regex: new RegExp(searchQuery, 'i') } } : {};
+		const skipAmount = (page - 1) * pageSize;
 		let sortOptions = {};
 
 		switch (filter) {
@@ -32,9 +33,11 @@ export async function getAllTags(params: GetAllTagsParams) {
 				break;
 		}
 
-		const tags = await Tag.find(query).sort(sortOptions);
+		const tags = await Tag.find(query).skip(skipAmount).limit(pageSize).sort(sortOptions);
+		const tagsCount = await Tag.countDocuments(query);
+		const isNext = tagsCount > tags.length + skipAmount;
 
-		return { tags };
+		return { tags, isNext };
 	} catch (error) {
 		console.log(error);
 		throw error;
@@ -43,10 +46,11 @@ export async function getAllTags(params: GetAllTagsParams) {
 
 export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
 	try {
-		await connectToDB();
+		connectToDB();
 
-		const { tagId, page, pageSize = 10, searchQuery } = params;
+		const { tagId, page = 1, pageSize = 1, searchQuery } = params;
 		const tagFilter: FilterQuery<ITag> = { _id: tagId };
+		const skipAmount = (page - 1) * pageSize;
 
 		const tag = await Tag.findOne(tagFilter).populate({
 			path: 'questions',
@@ -63,8 +67,12 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
 			throw new Error('Tag not found');
 		}
 
-		const questions = tag.questions;
-		return { questions, tagTitle: tag.name };
+		const { questions } = tag;
+		const totalQuestions = questions.length;
+		const paginatedQuestions = questions.slice(skipAmount).slice(0, pageSize);
+		const isNext = totalQuestions > paginatedQuestions.length + skipAmount;
+
+		return { questions: paginatedQuestions, tagTitle: tag.name, isNext };
 	} catch (error) {
 		console.log(error);
 		throw error;
@@ -73,7 +81,7 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
 
 export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
 	try {
-		await connectToDB();
+		connectToDB();
 		const { userId } = params;
 
 		const user = await User.findById(userId);

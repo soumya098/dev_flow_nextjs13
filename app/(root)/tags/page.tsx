@@ -1,6 +1,7 @@
 import TagCard from '@/components/cards/TagCard';
 import Filter from '@/components/shared/Filter';
 import NoResult from '@/components/shared/NoResult';
+import Pagination from '@/components/shared/Pagination';
 import LocalSearchBar from '@/components/shared/search/LocalSearchBar';
 import { TagFilters } from '@/constants/filters';
 import { getAllTags } from '@/lib/actions/tag.action';
@@ -10,7 +11,8 @@ import React from 'react';
 const Tag = async ({ searchParams }: SearchParamsProps) => {
 	const searchQuery = searchParams.q;
 	const filter = searchParams.filter;
-	const result = await getAllTags({ searchQuery, filter });
+	const page = searchParams.page ? +searchParams.page : 1;
+	const result = await getAllTags({ searchQuery, filter, page });
 
 	return (
 		<>
@@ -31,6 +33,8 @@ const Tag = async ({ searchParams }: SearchParamsProps) => {
 					<NoResult title='No Tags Found' desc='It looks like there are no tags available' link='/ask-question' linkText='Ask a Question' />
 				)}
 			</section>
+
+			<Pagination pageNumber={page} isNext={result.isNext} />
 		</>
 	);
 };

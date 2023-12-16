@@ -16,6 +16,7 @@ import React from 'react';
 const QuestionPage = async ({ params, searchParams }: URLProps) => {
 	const questionId = params.id;
 	const filter = searchParams.filter;
+	const page = searchParams.page ? +searchParams.page : 1;
 	const { userId } = auth();
 	let currUser;
 
@@ -83,7 +84,7 @@ const QuestionPage = async ({ params, searchParams }: URLProps) => {
 				))}
 			</div>
 
-			<AllAnswers questionId={result._id} userId={currUser?._id} totalAnswers={result.answers.length} filter={filter} />
+			<AllAnswers questionId={result._id} userId={currUser?._id} totalAnswers={result.answers.length} filter={filter} page={page} />
 
 			<Answer question={result.content} questionId={JSON.stringify(result._id)} authorId={JSON.stringify(currUser?._id)} />
 		</>

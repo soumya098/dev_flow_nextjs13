@@ -29,8 +29,9 @@ export const createAnswer = async (params: CreateAnswerParams) => {
 
 export const getAnswers = async (params: GetAnswersParams) => {
 	try {
-		await connectToDB();
-		const { questionId, filter } = params;
+		connectToDB();
+		const { questionId, filter, page = 1, pageSize = 1 } = params;
+		const skipAmount = (page - 1) * pageSize;
 		let sortOptions = {};
 
 		switch (filter) {
@@ -51,11 +52,16 @@ export const getAnswers = async (params: GetAnswersParams) => {
 				break;
 		}
 
+		const totalAnswers = await Answer.countDocuments({ question: questionId });
 		const answers = await Answer.find({ question: questionId })
 			.populate({ path: 'author', model: User, select: '_id clerkId name picture' })
+			.skip(skipAmount)
+			.limit(pageSize)
 			.sort(sortOptions);
 
-		return { answers };
+		const isNext = totalAnswers > skipAmount + answers.length;
+
+		return { answers, isNext };
 	} catch (error) {
 		console.log(error);
 		throw error;
