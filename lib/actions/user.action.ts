@@ -16,6 +16,8 @@ import {
 	UpdateUserParams
 } from './shared';
 import { revalidatePath } from 'next/cache';
+import { BadgeCriteriaType } from '@/types';
+import { assignBadges } from '../utils';
 
 export async function getAllUsers(params: GetAllUsersParams) {
 	try {
@@ -233,7 +235,32 @@ export async function getUserInfo(params: GetUserByIdParams) {
 
 		const totalQuestions = await Question.countDocuments({ author: user._id });
 		const totalAnswers = await Answer.countDocuments({ author: user._id });
-		return { user, totalQuestions, totalAnswers };
+
+		const [questionUpVotes] = await Question.aggregate([
+			{ $match: { author: user._id } },
+			{ $project: { _id: 0, upVoteSize: { $size: '$upVotes' } } },
+			{ $group: { _id: null, totalUpVotes: { $sum: '$upVoteSize' } } }
+		]);
+
+		const [answerUpVotes] = await Answer.aggregate([
+			{ $match: { author: user._id } },
+			{ $project: { _id: 0, upVoteSize: { $size: '$upVotes' } } },
+			{ $group: { _id: null, totalUpVotes: { $sum: '$upVoteSize' } } }
+		]);
+
+		const [questionViews] = await Question.aggregate([{ $match: { author: user._id } }, { $group: { _id: null, totalViews: { $sum: '$views' } } }]);
+
+		const criteria = [
+			{ type: 'QUESTION_COUNT' as BadgeCriteriaType, count: totalQuestions },
+			{ type: 'ANSWER_COUNT' as BadgeCriteriaType, count: totalAnswers },
+			{ type: 'QUESTION_UPVOTES' as BadgeCriteriaType, count: questionUpVotes?.totalUpVotes || 0 },
+			{ type: 'ANSWER_UPVOTES' as BadgeCriteriaType, count: answerUpVotes?.totalUpVotes || 0 },
+			{ type: 'TOTAL_VIEWS' as BadgeCriteriaType, count: questionViews?.totalViews || 0 }
+		];
+
+		const badgeCounts = assignBadges({ criteria });
+
+		return { user, totalQuestions, totalAnswers, badgeCounts };
 	} catch (error) {
 		console.log(error);
 	}
@@ -242,14 +269,14 @@ export async function getUserInfo(params: GetUserByIdParams) {
 export async function getUserQuestions(params: GetUserStatsParams) {
 	try {
 		connectToDB();
-		const { userId, page = 1, pageSize = 1 } = params;
+		const { userId, page = 1, pageSize = 10 } = params;
 		const skipAmount = (page - 1) * pageSize;
 
 		const totalQuestions = await Question.countDocuments({ author: userId });
 		const userQuestions = await Question.find({ author: userId })
 			.skip(skipAmount)
 			.limit(pageSize)
-			.sort({ views: -1 })
+			.sort({ createdAt: -1, views: -1, upVotes: -1 })
 			.populate('tags', '_id name')
 			.populate('author', '_id clerkId name picture');
 
@@ -271,7 +298,7 @@ export async function getUserAnswers(params: GetUserStatsParams) {
 		const userAnswers = await Answer.find({ author: userId })
 			.skip(skipAmount)
 			.limit(pageSize)
-			.sort({ upVotes: -1 })
+			.sort({ createdAt: -1, upVotes: -1 })
 			.populate('question', '_id title')
 			.populate('author', '_id clerkId name picture');
 

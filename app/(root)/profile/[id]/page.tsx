@@ -14,7 +14,7 @@ import AnswersTab from '@/components/shared/AnswersTab';
 
 const page = async ({ params, searchParams }: URLProps) => {
 	const { userId: clerkId } = auth();
-	const userInfo = await getUserInfo({ userId: params?.id });
+	const userInfo = await getUserInfo({ userId: params.id });
 
 	return (
 		<>
@@ -50,7 +50,7 @@ const page = async ({ params, searchParams }: URLProps) => {
 				</div>
 			</div>
 
-			<Stats totalQuestions={userInfo?.totalQuestions} totalAnswers={userInfo?.totalAnswers} />
+			<Stats totalQuestions={userInfo?.totalQuestions} totalAnswers={userInfo?.totalAnswers} badges={userInfo?.badgeCounts} />
 
 			<div className='mt-8 flex gap-10'>
 				<Tabs defaultValue='question' className='flex-1'>

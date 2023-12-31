@@ -10,7 +10,7 @@ import Question from '@/database/question.model';
 export async function getAllTags(params: GetAllTagsParams) {
 	try {
 		connectToDB();
-		const { page = 1, filter, searchQuery, pageSize = 2 } = params;
+		const { page = 1, filter, searchQuery, pageSize = 20 } = params;
 		const query: FilterQuery<ITag> = searchQuery ? { name: { $regex: new RegExp(searchQuery, 'i') } } : {};
 		const skipAmount = (page - 1) * pageSize;
 		let sortOptions = {};

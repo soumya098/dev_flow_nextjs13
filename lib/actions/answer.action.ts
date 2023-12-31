@@ -11,14 +11,15 @@ export const createAnswer = async (params: CreateAnswerParams) => {
 	try {
 		await connectToDB();
 		const { content, userId, questionId, path } = params;
-
 		const newAnswer = await Answer.create({ content, author: userId, question: questionId });
 
-		await Question.findByIdAndUpdate(questionId, {
+		const question = await Question.findByIdAndUpdate(questionId, {
 			$push: { answers: newAnswer._id }
 		});
 
-		// TODO: Add interaction
+		// create Interaction and increment author's reputation by +10 for answering
+		await Interaction.create({ user: userId, action: 'submit_answer', question: questionId, answer: newAnswer._id, tags: question.tags });
+		await User.findByIdAndUpdate(userId, { $inc: { reputation: 10 } });
 
 		revalidatePath(path);
 	} catch (error) {
@@ -91,7 +92,11 @@ export async function upVoteAnswer(params: AnswerVoteParams) {
 			throw new Error('Answer not found!');
 		}
 
-		// increment authors reputation
+		// increment user's reputation by +2/-2 for upVoting/revoking an upvote to a answer
+		await User.findByIdAndUpdate(userId, { $inc: { reputation: hasUpVoted ? -2 : 2 } });
+
+		// increment user's reputation by +10/-10 for receiving upVote/revoke an upvote on their answer
+		await User.findByIdAndUpdate(answer.author, { $inc: { reputation: hasUpVoted ? -10 : 10 } });
 
 		revalidatePath(path);
 	} catch (error) {
@@ -123,7 +128,11 @@ export async function downVoteAnswer(params: AnswerVoteParams) {
 			throw new Error('Answer not found!');
 		}
 
-		// increment authors reputation
+		// increment user's reputation by -2/+2 for downVoting/revoking a downvote to an answer
+		await User.findByIdAndUpdate(userId, { $inc: { reputation: hasDownVoted ? 2 : -2 } });
+
+		// increment authors reputation by -2/+2 for receiving downVote/revoke a downvote on their answer
+		await User.findByIdAndUpdate(answer.author, { $inc: { reputation: hasDownVoted ? 10 : -10 } });
 
 		revalidatePath(path);
 	} catch (error) {

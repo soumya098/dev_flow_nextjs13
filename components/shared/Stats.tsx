@@ -1,10 +1,14 @@
 import { formatNumber } from '@/lib/utils';
+import { BadgeCounts } from '@/types';
+
 import Image from 'next/image';
 import React from 'react';
 
 interface Props {
 	totalQuestions: number | undefined;
 	totalAnswers: number | undefined;
+	badges?: BadgeCounts;
+	reputations?: number;
 }
 
 interface StatsCardProps {
@@ -26,7 +30,7 @@ const StatsCard = ({ imgUrl, value, title }: StatsCardProps) => {
 	);
 };
 
-const Stats = ({ totalQuestions, totalAnswers }: Props) => {
+const Stats = ({ totalQuestions, totalAnswers, badges }: Props) => {
 	return (
 		<div className='mt-10'>
 			<h4 className='h3-semibold text-dark200_light900'>Stats</h4>
@@ -43,9 +47,9 @@ const Stats = ({ totalQuestions, totalAnswers }: Props) => {
 					</div>
 				</div>
 
-				<StatsCard imgUrl='/assets/icons/gold-medal.svg' value={0} title='Gold Badges' />
-				<StatsCard imgUrl='/assets/icons/silver-medal.svg' value={0} title='Silver Badges' />
-				<StatsCard imgUrl='/assets/icons/bronze-medal.svg' value={0} title='Bronze Badges' />
+				<StatsCard imgUrl='/assets/icons/gold-medal.svg' value={badges?.GOLD || 0} title='Gold Badges' />
+				<StatsCard imgUrl='/assets/icons/silver-medal.svg' value={badges?.SILVER || 0} title='Silver Badges' />
+				<StatsCard imgUrl='/assets/icons/bronze-medal.svg' value={badges?.BRONZE || 0} title='Bronze Badges' />
 			</div>
 		</div>
 	);

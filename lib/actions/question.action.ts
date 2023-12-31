@@ -107,9 +107,9 @@ export async function createQuestion(params: CreateQuestionParams) {
 		connectToDB();
 
 		const { title, content, tags, author, path } = params;
-		const question = await Question.create({ title, content, author });
-
 		const tagDocuments = [];
+
+		const question = await Question.create({ title, content, author });
 
 		for (const tag of tags) {
 			// create a new tag or fetch if already exists
@@ -129,7 +129,9 @@ export async function createQuestion(params: CreateQuestionParams) {
 			$push: { tags: { $each: tagDocuments } }
 		});
 
-		// TODO: increment author's reputation by +5 for asking question
+		// create Interaction and increment author's reputation by +5 for asking question
+		await Interaction.create({ user: author, action: 'ask_question', question: question._id, tags: tagDocuments });
+		await User.findByIdAndUpdate(author, { $inc: { reputation: 5 } });
 
 		revalidatePath(path);
 	} catch (error) {
@@ -183,7 +185,11 @@ export async function upVoteQuestion(params: QuestionVoteParams) {
 			throw new Error('Question not found!');
 		}
 
-		// increment authors reputation
+		// increment user's reputation by +1/-1 for upVoting/revoking an upvote to a question
+		await User.findByIdAndUpdate(userId, { $inc: { reputation: hasUpVoted ? -1 : 1 } });
+
+		// increment authors reputation by +10/-10 for receiving upVote/revoke an upvote on their question
+		await User.findByIdAndUpdate(question.author, { $inc: { reputation: hasUpVoted ? -10 : 10 } });
 
 		revalidatePath(path);
 	} catch (error) {
@@ -215,7 +221,11 @@ export async function downVoteQuestion(params: QuestionVoteParams) {
 			throw new Error('Question not found!');
 		}
 
-		// increment authors reputation
+		// increment user's reputation by -1/+1 for downVoting/revoking a downvote to a question
+		await User.findByIdAndUpdate(userId, { $inc: { reputation: hasDownVoted ? 1 : -1 } });
+
+		// increment authors reputation by -2/+2 for receiving downVote/revoke a downvote on their question
+		await User.findByIdAndUpdate(question.author, { $inc: { reputation: hasDownVoted ? 2 : -2 } });
 
 		revalidatePath(path);
 	} catch (error) {
