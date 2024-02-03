@@ -22,7 +22,7 @@ import { assignBadges } from '../utils';
 export async function getAllUsers(params: GetAllUsersParams) {
 	try {
 		connectToDB();
-		const { page = 1, filter, pageSize = 1, searchQuery } = params;
+		const { page = 1, filter, pageSize = 12, searchQuery } = params;
 		const skipAmount = (page - 1) * pageSize;
 		const query: FilterQuery<IUser> = {};
 		let sortOptions = {};
