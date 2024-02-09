@@ -2,7 +2,6 @@
 import { useTheme } from '@/context/ThemeProvider';
 import Image from 'next/image';
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from '@/components/ui/menubar';
-
 import React from 'react';
 import { themes } from '@/constants';
 
@@ -12,7 +11,7 @@ const Theme = () => {
 	return (
 		<Menubar className='relative border-none bg-transparent shadow-none'>
 			<MenubarMenu>
-				<MenubarTrigger className='dark:data-[state==closed]:bg-light-200 cursor-pointer focus:bg-light-900 data-[state==open]:bg-light-900 dark:focus:bg-dark-200'>
+				<MenubarTrigger className='cursor-pointer focus:bg-light-900 data-[state==open]:bg-light-900 dark:focus:bg-dark-200 dark:data-[state==closed]:bg-light-400'>
 					{mode === 'dark' ? (
 						<Image src='/assets/icons/moon.svg' width={20} height={20} alt='dark' className='active-theme' />
 					) : (

@@ -11,8 +11,8 @@ const inter = Inter({ subsets: ['latin'], weight: ['100', '200', '300', '400', '
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700'], variable: '--font-spaceGrotesk' });
 
 export const metadata: Metadata = {
-	title: 'DevFlow',
-	description: 'dfbh etheth',
+	title: 'DevFlow | Home Page',
+	description: 'Home page of DevFlow',
 	icons: {
 		icon: '/assets/images/site-logo.svg'
 	}

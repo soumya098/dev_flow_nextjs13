@@ -7,6 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { downVoteAnswer, upVoteAnswer } from '@/lib/actions/answer.action';
 import { toggleSaveQuestion } from '@/lib/actions/user.action';
 import { viewQuestion } from '@/lib/actions/interaction.action';
+import { useToast } from '@/components/ui/use-toast';
 
 interface Props {
 	type: string;
@@ -22,6 +23,7 @@ interface Props {
 const Vote = ({ upVotes, downVotes, type, itemId, userId, hasSaved, hasDownVoted, hasUpVoted }: Props) => {
 	const pathName = usePathname();
 	const router = useRouter();
+	const { toast } = useToast();
 
 	useEffect(() => {
 		viewQuestion({ questionId: JSON.parse(itemId), userId: userId ? JSON.parse(userId) : undefined });
@@ -32,6 +34,14 @@ const Vote = ({ upVotes, downVotes, type, itemId, userId, hasSaved, hasDownVoted
 			if (type === 'question') {
 				await toggleSaveQuestion({ questionId: JSON.parse(itemId), userId: JSON.parse(userId), path: pathName });
 			}
+			toast({
+				title: hasSaved ? 'Removed' : 'Saved'
+			});
+		} else {
+			toast({
+				title: 'Please Log In',
+				description: 'You must be logged in to perform this action'
+			});
 		}
 	};
 
@@ -42,6 +52,16 @@ const Vote = ({ upVotes, downVotes, type, itemId, userId, hasSaved, hasDownVoted
 			} else if (type === 'answer') {
 				await upVoteAnswer({ answerId: JSON.parse(itemId), userId: JSON.parse(userId), hasUpVoted, hasDownVoted, path: pathName });
 			}
+
+			toast({
+				title: `Upvote ${hasUpVoted ? 'Removed' : 'Successfull'}`,
+				variant: hasUpVoted ? 'destructive' : 'default'
+			});
+		} else {
+			toast({
+				title: 'Please Log In',
+				description: 'You must be logged in to perform this action'
+			});
 		}
 	};
 
@@ -52,6 +72,16 @@ const Vote = ({ upVotes, downVotes, type, itemId, userId, hasSaved, hasDownVoted
 			} else if (type === 'answer') {
 				await downVoteAnswer({ answerId: JSON.parse(itemId), userId: JSON.parse(userId), hasUpVoted, hasDownVoted, path: pathName });
 			}
+
+			toast({
+				title: `Downvote ${hasDownVoted ? 'Removed' : 'Successfull'}`,
+				variant: hasDownVoted ? 'destructive' : 'default'
+			});
+		} else {
+			toast({
+				title: 'Please Log In',
+				description: 'You must be logged in to perform this action'
+			});
 		}
 	};
 
