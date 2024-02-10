@@ -35,7 +35,8 @@ const Vote = ({ upVotes, downVotes, type, itemId, userId, hasSaved, hasDownVoted
 				await toggleSaveQuestion({ questionId: JSON.parse(itemId), userId: JSON.parse(userId), path: pathName });
 			}
 			toast({
-				title: hasSaved ? 'Removed' : 'Saved'
+				title: hasSaved ? 'Question Removed from your collection' : 'Question Saved in  your collection',
+				variant: hasSaved ? 'destructive' : 'success'
 			});
 		} else {
 			toast({

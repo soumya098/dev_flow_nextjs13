@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 
 		const result = await res.json();
 		return NextResponse.json({ message: 'OK', reply: result.choices[0].message.content });
-	} catch (error) {
+	} catch (error: any) {
 		return NextResponse.json({ error: error.message });
 	}
 }

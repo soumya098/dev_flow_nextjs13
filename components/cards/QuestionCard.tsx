@@ -17,6 +17,7 @@ interface Props {
 		_id: string;
 		name: string;
 		picture: string;
+		clerkId: string;
 	};
 	views: number;
 	upVotes: Array<object>;

@@ -12,9 +12,13 @@ interface Props {
 		_id: string;
 		name: string;
 		picture: string;
+		clerkId: string;
 	};
 	upVotes: number;
-	question: object;
+	question: {
+		_id: string;
+		title: string;
+	};
 	createdAt: Date;
 	clerkId?: string | null;
 }

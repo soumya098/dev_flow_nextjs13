@@ -21,9 +21,7 @@ export async function POST(req: Request) {
 
 	// If there are no headers, error out
 	if (!svixId || !svixTimestamp || !svixSignature) {
-		return new Response('Error occurred -- no svix headers', {
-			status: 400
-		});
+		return NextResponse.json({ message: 'Error occurred -- no svix headers', status: 400 });
 	}
 
 	// Get the body
@@ -44,9 +42,7 @@ export async function POST(req: Request) {
 		}) as WebhookEvent;
 	} catch (err) {
 		console.error('Error verifying webhook:', err);
-		return new Response('Error occurred', {
-			status: 400
-		});
+		return NextResponse.json({ message: 'Error occurred', status: 400 });
 	}
 
 	const eventType = evt.type;
@@ -92,5 +88,5 @@ export async function POST(req: Request) {
 		return NextResponse.json({ message: 'OK', user: deletedUser });
 	}
 
-	return new Response('', { status: 201 });
+	return NextResponse.json({ message: 'OK', status: 201 });
 }

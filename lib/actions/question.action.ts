@@ -98,8 +98,6 @@ export async function getRecommendedQuestions(params: RecommendedParams) {
 			return tags;
 		}, []);
 
-		console.log(userTags);
-
 		// Get distinct tag IDs from user's interactions
 		const distinctUserTagIds = [
 			// @ts-ignore

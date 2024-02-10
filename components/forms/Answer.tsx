@@ -1,11 +1,11 @@
 'use client';
+import React, { useRef, useState } from 'react';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '../ui/form';
 import { useForm } from 'react-hook-form';
 import { AnswerSchema } from '@/lib/validations';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Editor } from '@tinymce/tinymce-react';
-import { useRef, useState } from 'react';
 import { useTheme } from '@/context/ThemeProvider';
 import { Button } from '../ui/button';
 import Image from 'next/image';
@@ -141,7 +141,7 @@ const Answer = ({ question, questionId, authorId }: Props) => {
 												'undo redo | ' + 'codesample | bold italic forecolor | alignleft aligncenter |' + 'alignright alignjustify | bullist numlist',
 											content_style: 'body { font-family:Inter; font-size:16px }',
 											skin: mode === 'dark' ? 'oxide-dark' : 'oxide',
-											content_css: mode === 'dark' ? 'dark' : 'light'
+											content_css: mode === 'dark' ? 'dark' : 'fabric'
 										}}
 									/>
 								</FormControl>
