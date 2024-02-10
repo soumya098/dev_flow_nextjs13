@@ -69,6 +69,11 @@ const page = async ({ params, searchParams }: URLProps) => {
 						<AnswersTab userId={userInfo?.user._id} clerkId={userInfo?.user.clerkId} searchParams={searchParams} />
 					</TabsContent>
 				</Tabs>
+
+				<div className='flex min-w-[278px] max-lg:hidden'>
+					<h4 className='h3-semibold text-dark200_light900'>Top Tags</h4>
+					{/* TODO: get users top tags from interactions */}
+				</div>
 			</div>
 		</>
 	);

@@ -32,7 +32,7 @@ const Filter = ({ options, otherClasses }: Props) => {
 				<SelectContent className='background-light800_dark300 text-dark500_light700 light-border'>
 					<SelectGroup>
 						{options.map((option) => (
-							<SelectItem key={option.value} value={option.value}>
+							<SelectItem key={option.value} value={option.value} className='focus:bg-light-900 dark:focus:bg-dark-400'>
 								{option.name}
 							</SelectItem>
 						))}

@@ -6,15 +6,32 @@ import Pagination from '@/components/shared/Pagination';
 import LocalSearchBar from '@/components/shared/search/LocalSearchBar';
 import { Button } from '@/components/ui/button';
 import { HomePageFilters } from '@/constants/filters';
-import { getQuestions } from '@/lib/actions/question.action';
+import { getQuestions, getRecommendedQuestions } from '@/lib/actions/question.action';
 import { SearchParamsProps } from '@/types';
 import Link from 'next/link';
+import { auth } from '@clerk/nextjs';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+	title: 'Home | Dev Overflow'
+};
 
 const Home = async ({ searchParams }: SearchParamsProps) => {
 	const filter = searchParams.filter;
 	const searchQuery = searchParams.q;
 	const page = searchParams.page ? +searchParams.page : 1;
-	const result = await getQuestions({ filter, searchQuery, page });
+	const { userId } = auth();
+	let result;
+
+	if (filter === 'recommended') {
+		if (userId) {
+			result = await getRecommendedQuestions({ userId, searchQuery, page });
+		} else {
+			result = { questions: [], isNext: false };
+		}
+	} else {
+		result = await getQuestions({ filter, searchQuery, page });
+	}
 
 	return (
 		<>

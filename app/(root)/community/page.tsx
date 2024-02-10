@@ -10,7 +10,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: 'DevFlow | Community',
+	title: 'Community | DevFlow',
 	description: 'Community page of DevFlow',
 	icons: {
 		icon: '/assets/images/site-logo.svg'

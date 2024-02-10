@@ -18,7 +18,7 @@ const Theme = () => {
 						<Image src='/assets/icons/sun.svg' width={20} height={20} alt='light' className='active-theme' />
 					)}
 				</MenubarTrigger>
-				<MenubarContent className='absolute right-[-3rem] mt-3 min-w-[120px] rounded border bg-white py-2 dark:border-dark-400 dark:bg-dark-300'>
+				<MenubarContent className='absolute right-[-3rem] mt-3 min-w-[120px] rounded border bg-light-900 py-2 dark:border-dark-400 dark:bg-dark-300'>
 					{themes.map((theme) => (
 						<MenubarItem
 							key={theme.value}
